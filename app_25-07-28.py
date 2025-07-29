@@ -81,7 +81,12 @@ def create_graph(targets, date):
         plt.ylim([0.01, 5])
         plt.yscale('log')
 
+
+        handles, labels = plt.gca().get_legend_handles_labels()
+        handles, labels = zip(* sorted(zip(handles, labels), key=lambda x: x[1]))
+        plt.gca().legend(handles, labels)
         plt.legend(fontsize=9, loc='upper left')
+        # TIP: https://www.sqlpey.com/python/top-2-methods-to-control-legend-order-in-matplotlib/
         plt.show()
 
 create_graph([(df_goi_piv, targets[goi_idx]), (df_ref_piv, targets[ref_idx])], date)
