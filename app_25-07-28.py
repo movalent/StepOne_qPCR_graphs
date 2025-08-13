@@ -1,8 +1,9 @@
 from datetime import datetime
 
 import openpyxl
-import matplotlib.pyplot as plt
 import pandas as pd
+import matplotlib.pyplot as plt
+from matplotlib.ticker import ScalarFormatter
 
 pd.options.display.width = 0
 pd.options.display.max_columns = 15
@@ -101,11 +102,12 @@ def create_graph(targets, date):
 
         plt.ylim([0.01, 5])
         plt.yscale('log')
+        plt.gca().yaxis.set_major_formatter(ScalarFormatter())
 
         handles, labels = plt.gca().get_legend_handles_labels()
         handles, labels = zip(* sorted(zip(handles, labels), key=lambda x: x[1]))
-        plt.gca().legend(handles, labels)
-        plt.legend(fontsize=9, loc='upper left')
+
+        plt.legend(handles, labels, fontsize=9, loc='upper left')
         # TIP: https://www.sqlpey.com/python/top-2-methods-to-control-legend-order-in-matplotlib/
         plt.show()
 
