@@ -52,13 +52,14 @@ detected_targets = df_results['Target Name'].dropna().unique()
 
 # Select if housekeeping is first or second on the target list
 print('Detected amplification targets: ', detected_targets)
-goi_prompt = input(f'Is {detected_targets[0]} a GoI: y/n ')
-if goi_prompt == 'y':
-    goi_idx = 0
-    ref_idx = 1
-else:
-    goi_idx = 1
-    ref_idx = 0
+
+for target_name in detected_targets:
+    goi_prompt = input(f'Is {target_name} a GoI: y/n ')
+    if goi_prompt == 'y':
+        goi_idx = list(detected_targets).index(target_name)
+    ref_prompt = input(f'Is {target_name} a housekeeping: y/n ')
+    if ref_prompt == 'y':
+        ref_idx = list(detected_targets).index(target_name)
 
 columns_to_keep = df_sample_info[df_sample_info['Include'] == 1.0]['Well']
 columns_to_keep = list(columns_to_keep)
