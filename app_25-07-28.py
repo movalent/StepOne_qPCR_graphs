@@ -54,22 +54,34 @@ detected_targets = df_results['Target Name'].dropna().unique()
 print('Detected amplification targets: ', detected_targets)
 
 for target_name in detected_targets:
+    if target_name in ['ACTB', 'GAPDH', 'RNAseP']:
+        ref_idx = list(detected_targets).index(target_name)
+        ref_status = 1
+        continue
     goi_prompt = input(f'Is {target_name} a GoI: y/n ')
     if goi_prompt == 'y':
         goi_idx = list(detected_targets).index(target_name)
+        goi_status = 1
+        continue
     ref_prompt = input(f'Is {target_name} a housekeeping: y/n ')
     if ref_prompt == 'y':
         ref_idx = list(detected_targets).index(target_name)
+        ref_status = 1
 
 columns_to_keep = df_sample_info[df_sample_info['Include'] == 1.0]['Well']
 columns_to_keep = list(columns_to_keep)
 
 # Separate results based on target name & removing unwanted cells (not to keep)
-df_goi = df_results[(df_results['Target Name'] == detected_targets[goi_idx]) & (df_results['Well'].isin(columns_to_keep))]
-df_ref = df_results[(df_results['Target Name'] == detected_targets[ref_idx]) & (df_results['Well'].isin(columns_to_keep))]
-
-df_goi_piv = df_goi.pivot_table(index='Cycle', columns='Well', values='ΔRn')
-df_ref_piv = df_ref.pivot_table(index='Cycle', columns='Well', values='ΔRn')
+# TODO: If result file has only one target, script will crash as list of targets has only one item.
+targets = []
+if goi_status:
+    df_goi = df_results[(df_results['Target Name'] == detected_targets[goi_idx]) & (df_results['Well'].isin(columns_to_keep))]
+    df_goi_piv = df_goi.pivot_table(index='Cycle', columns='Well', values='ΔRn')
+    targets.append((df_goi_piv, detected_targets[goi_idx]))
+if ref_status:
+    df_ref = df_results[(df_results['Target Name'] == detected_targets[ref_idx]) & (df_results['Well'].isin(columns_to_keep))]
+    df_ref_piv = df_ref.pivot_table(index='Cycle', columns='Well', values='ΔRn')
+    targets.append((df_ref_piv, detected_targets[ref_idx]))
 
 # Dictionary that holds sample info
 df_sample_info.set_index('Well', inplace=True)
@@ -112,4 +124,4 @@ def create_graph(targets, date):
         # TIP: https://www.sqlpey.com/python/top-2-methods-to-control-legend-order-in-matplotlib/
         plt.show()
 
-create_graph([(df_goi_piv, detected_targets[goi_idx]), (df_ref_piv, detected_targets[ref_idx])], experiment_date_formatted)
+create_graph(targets, experiment_date_formatted)
