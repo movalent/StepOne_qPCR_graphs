@@ -1,1 +1,1 @@
-# fragment-analyzer-analysis
+Script to visualize experimental data from Thermofisher StepOne PCR Systems.
