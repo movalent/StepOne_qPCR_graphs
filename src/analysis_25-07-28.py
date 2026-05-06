@@ -10,7 +10,7 @@ pd.options.display.width = 0
 pd.options.display.max_columns = 15
 
 # Resolve the path
-DATA_DIR = Path(__file__).resolve(strict=True).parent
+DATA_DIR = Path(__file__).resolve(strict=True).parent.parent / 'data'
 INPUT = DATA_DIR / 'input' / 'Results.xls'
 LEGEND = DATA_DIR / 'metadata' / 'Plate_layout.xlsx'
 OUTPUT = DATA_DIR / 'output'
