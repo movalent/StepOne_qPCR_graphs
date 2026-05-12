@@ -9,15 +9,17 @@ from matplotlib.ticker import ScalarFormatter
 pd.options.display.width = 0
 pd.options.display.max_columns = 15
 
-BASE_DIR = Path(__file__).resolve().parent
-path_input_file = BASE_DIR / 'data' / 'input' / 'Results.xls'
-path_layout_file = BASE_DIR / 'data' / 'metadata' / 'Template_plate_layout.xlsx'
+# Resolve the path
+DATA_DIR = Path(__file__).resolve(strict=True).parent.parent / 'data'
+INPUT = DATA_DIR / 'input' / 'Results.xls'
+LEGEND = DATA_DIR / 'metadata' / 'Plate_layout.xlsx'
+OUTPUT = DATA_DIR / 'output'
 
 # Create dataframe to hold sample's info
 df_sample_info = pd.DataFrame(columns=['Well', 'Sample_name', 'Color', 'Include'])
 
 # Process the sample name
-df_name_color = pd.read_excel(path_layout_file)
+df_name_color = pd.read_excel(LEGEND)
 df_name_color.set_index('Unnamed: 0', inplace=True)
 column_names = list(range(1,13))
 
@@ -30,15 +32,15 @@ for row_letter_1, row in df_name_color.iloc[:8,].iterrows():  # Without iloc dat
 df_sample_info.dropna(inplace=True)
 
 # Extracting cell color via openpyxl
-workbook = openpyxl.load_workbook(path_layout_file)
+workbook = openpyxl.load_workbook(LEGEND)
 sheet = workbook.active
 for row_c in sheet.iter_rows():
     for cell in row_c:
         color = cell.fill.start_color.index
         df_sample_info.loc[df_sample_info['Sample_name'] == cell.value, 'Color'] = f'#{color[2:]}'  # TIP: openpyxl returns color in format where first two hex symbols must be axed to be read by matplotlib
 
-# Select which wells to be used
-df_include_cell = pd.read_excel(path_layout_file, skiprows=10)
+
+df_include_cell = pd.read_excel(LEGEND, skiprows=10)
 df_include_cell.set_index('Unnamed: 0', inplace=True)
 
 for row_letter_2, row in df_include_cell.iterrows():
@@ -47,12 +49,12 @@ for row_letter_2, row in df_include_cell.iterrows():
         df_sample_info.loc[df_sample_info['Well'] == cell_position, 'Include'] = cell_value
 
 # Read experiment date from metadata
-df_data = pd.read_excel(path_input_file, sheet_name='Amplification Data')
+df_data = pd.read_excel(INPUT, sheet_name='Amplification Data')
 experiment_date = datetime.strptime(df_data.iloc[2, 1][:10], '%Y-%m-%d')
 experiment_date_formatted = experiment_date.strftime('%d %b %Y')
 
 # Load amplification data
-df_results = pd.read_excel(path_input_file, sheet_name='Amplification Data', skiprows=7)
+df_results = pd.read_excel(INPUT, sheet_name='Amplification Data', skiprows=7)
 detected_targets = df_results['Target Name'].dropna().unique()
 
 # Select if housekeeping is first or second on the target list

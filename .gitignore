@@ -1,0 +1,9 @@
+# Editor files
+.idea/
+
+# Input/Output files
+data/metadata/Template_plate_layout.xlsx
+data/input/*
+!data/input/.gitkeep
+data/output/*
+!data/output/.gitkeep
