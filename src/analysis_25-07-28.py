@@ -1,3 +1,7 @@
+# Author: KlaudiaK
+# Creation date: 28 July 2025
+
+import yaml
 from datetime import datetime
 from pathlib import Path
 
@@ -10,10 +14,21 @@ pd.options.display.width = 0
 pd.options.display.max_columns = 15
 
 # Resolve the path
-DATA_DIR = Path(__file__).resolve(strict=True).parent.parent / 'data'
-INPUT = DATA_DIR / 'input' / 'Results.xls'
-LEGEND = DATA_DIR / 'metadata' / 'Plate_layout.xlsx'
-OUTPUT = DATA_DIR / 'output'
+MAIN_DIR = Path(__file__).resolve(strict=True).parent.parent
+print(MAIN_DIR)
+INPUT = MAIN_DIR / 'data' / 'input' / 'Results.xls'
+LEGEND = MAIN_DIR / 'data' / 'metadata' / 'Plate_layout.xlsx'
+OUTPUT = MAIN_DIR / 'data' / 'output'
+CONFIG = MAIN_DIR / 'config' / 'config.yaml'
+print(CONFIG)
+
+# Load the config
+with open(CONFIG) as file:
+    config = yaml.safe_load(file)
+
+REF_GENES = config['housekeeping_genes']
+
+print(REF_GENES)
 
 # Create dataframe to hold sample's info
 df_sample_info = pd.DataFrame(columns=['Well', 'Sample_name', 'Color', 'Include'])
