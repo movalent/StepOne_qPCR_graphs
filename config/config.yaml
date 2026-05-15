@@ -1,1 +1,7 @@
 housekeeping_genes: ["GAPDH", "RNAseP", "B2M", "ACTB"]
+thresholds:
+  eGFP: 0.1
+  RNAseP: 0.05
+  GAPDH: None
+  B2M: None 
+  
