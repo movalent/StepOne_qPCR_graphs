@@ -7,7 +7,7 @@ import re
 import numpy as np
 import pandas as pd
 
-from paths import INPUT, LEGEND, OUTPUT, CONFIG
+from paths import CONFIG, INPUT, LEGEND
 import file_utils
 import preprocessing
 import plotting

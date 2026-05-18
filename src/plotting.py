@@ -57,7 +57,9 @@ def create_graph(df, target_names, thresholds, date) -> plt:
         now = datetime.now()
         fmt_datetime = now.strftime('%Y-%m-%d %H-%M-%S')
 
-        plt.savefig(OUTPUT / f'{date}_{target}_{fmt_datetime}.tiff',
-                    transparent=True,
-                    dpi=600
-                    )
+        for file_type in ['.png', '.tiff']:
+            plt.savefig(OUTPUT / f'{date}_{target}_{fmt_datetime}.{file_type}',
+                        transparent=True,
+                        dpi=600
+                        )
+
