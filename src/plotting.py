@@ -5,8 +5,7 @@ from matplotlib.ticker import ScalarFormatter
 
 from paths import OUTPUT
 
-# Create graph
-def create_graph(df, target_names, thresholds, date) -> plt:
+def create_graph(df, target_names, thresholds, plot_prop, date) -> plt:
 
     for target in target_names:
 
@@ -57,9 +56,9 @@ def create_graph(df, target_names, thresholds, date) -> plt:
         now = datetime.now()
         fmt_datetime = now.strftime('%Y-%m-%d %H-%M-%S')
 
-        for file_type in ['.png', '.tiff']:
+        for file_type in ['png', 'tiff']:
             plt.savefig(OUTPUT / f'{date}_{target}_{fmt_datetime}.{file_type}',
-                        transparent=True,
-                        dpi=600
+                        transparent=plot_prop['transparent'],
+                        dpi=plot_prop['dpi']
                         )
 

@@ -1,7 +1,6 @@
 from datetime import datetime
 import re
 
-import numpy as np
 import pandas as pd
 
 def extract_date(raw_data: pd.DataFrame) -> pd.DatetimeIndex:

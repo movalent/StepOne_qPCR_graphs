@@ -8,12 +8,16 @@ import openpyxl
 def load_config(config_path: Path) -> tuple:
     with open(config_path) as file:
         config = yaml.safe_load(file)
+        print(config)
 
         REF_GENES = config['housekeeping_genes']
         REF_GENES = [x.lower() for x in REF_GENES]
 
         target_thresholds = config['thresholds']
-        return target_thresholds, REF_GENES
+
+        plot_properties = config['plot_properties']
+
+        return target_thresholds, REF_GENES, plot_properties
 
 def load_data(raw_path: Path, mapping_path: Path) -> tuple:
     raw_data = pd.read_excel(raw_path)

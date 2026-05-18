@@ -3,5 +3,7 @@ thresholds:
   eGFP: 0.1
   RNAseP: 0.05
   GAPDH: None
-  B2M: None 
-  
+  B2M: None
+plot_properties:
+  transparent: False
+  dpi: 600  
