@@ -11,24 +11,28 @@ def extract_date(raw_data: pd.DataFrame) -> pd.DatetimeIndex:
     return experiment_date_formatted
 
 def preprocess_raw_data(raw_data: pd.DataFrame) -> pd.DataFrame:
-    raw_data = raw_data.iloc[6:,]
-    raw_data = raw_data.rename(columns=raw_data.iloc[0]).iloc[1:]
-    raw_data = raw_data.set_index('Well')
+    df = raw_data.copy()
+    df = df.iloc[6:,]
+    df = df.rename(columns=df.iloc[0]).iloc[1:]
+    df = df.set_index('Well')
 
-    return raw_data
+    return df
 
 def preprocess_mapping_data(mapping_data: pd.DataFrame, raw_data: pd.DataFrame) -> pd.Dataframe:
+    df = raw_data.copy()
     to_include = mapping_data.iloc[10:18, :13]
     to_include = to_include.set_index(to_include.columns[0])
     to_include_long = to_include.stack()
 
     for (row_letter, col_idx), value in to_include_long.items():
         cell_coord = f'{row_letter}{col_idx}'
-        raw_data.loc[cell_coord, 'include'] = value
+        df.loc[cell_coord, 'include'] = value
 
-    return raw_data
+    return df
 
 def preprocess_name_color(sheet, raw_data) -> pd.DataFrame:
+
+    df = raw_data.copy()
 
     for row in sheet.iter_rows(min_row=2, max_row=9):
         row_letter = row[0].value
@@ -48,9 +52,9 @@ def preprocess_name_color(sheet, raw_data) -> pd.DataFrame:
                     color = fg.rgb
                     color = f'#{color[-6:]}'  # Openpyxl returns ARGB and matplotlib accepts RGB
 
-            raw_data.loc[cell_coord, 'sample_name'] = value
-            raw_data.loc[cell_coord, 'color'] = color
+            df.loc[cell_coord, 'sample_name'] = value
+            df.loc[cell_coord, 'color'] = color
 
-    target_names = raw_data['Target Name'].dropna().unique()
+    target_names = df['Target Name'].dropna().unique()
 
-    return raw_data, target_names
+    return df, target_names

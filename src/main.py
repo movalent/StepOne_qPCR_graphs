@@ -25,7 +25,7 @@ def main() -> None:
     # Process the data
     experiment_date_formatted = preprocessing.extract_date(raw_data)
     raw_data = preprocessing.preprocess_raw_data(raw_data)
-    mapping_data = preprocessing.preprocess_mapping_data(mapping_data, raw_data)
+    raw_data = preprocessing.preprocess_mapping_data(mapping_data, raw_data)
 
     raw_data, target_names,  = preprocessing.preprocess_name_color(openpyxl_sheet, raw_data)
     # print(raw_data)

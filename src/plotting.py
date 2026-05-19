@@ -62,4 +62,5 @@ def create_graph(df, target_names, thresholds, plot_prop, date, data_paths) -> p
                         transparent=plot_prop['transparent'],
                         dpi=plot_prop['dpi']
                         )
+        plt.close()
 
