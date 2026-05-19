@@ -21,13 +21,13 @@ def load_config(config_path: Path) -> tuple:
 
         return target_thresholds, REF_GENES, plot_properties, results_file_name
 
-def load_data(raw_path: Path, mapping_path: Path) -> tuple:
+def load_raw_data(raw_path: Path, mapping_path: Path) -> tuple:
     raw_data = pd.read_excel(raw_path)
     mapping_data = pd.read_excel(mapping_path)
 
     return raw_data, mapping_data
 
-def load_data_openpyxl(mapping_path: Path) -> pd.Dataframe:
+def load_plate_layout(mapping_path: Path) -> pd.Dataframe:
 
     workbook = openpyxl.load_workbook(mapping_path)
     sheet = workbook.active

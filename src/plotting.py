@@ -3,7 +3,25 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 from matplotlib.ticker import ScalarFormatter
 
-def create_graph(df, target_names, thresholds, plot_prop, date, data_paths) -> plt:
+def create_amplification_plots(df, target_names, thresholds, plot_prop, date, data_paths) -> plt:
+    GRAPH_LINEWIDTH = 0.75
+    GRAPH_FONTNAME = 'Cambria'
+
+    TITLE_FONTSIZE = 16
+    AXIS_FONTSIZE = 14
+    LEGEND_FONTSIZE = 9
+
+    DISP_CYCLE_START = 0
+    DISP_CYCLE_END = 40
+    DISP_CYCLE_INTERVAL = 2
+
+    DISP_RN_MIN = 0.01
+    DISP_RN_MAX = 5
+
+    THRESHOLD_LINE_COL = 'red'
+    THRESHOLD_LINE_STYLE = 'dashed'
+
+    OUTPUT_FORMATS = ['png', 'tiff', 'pdf']
 
     for target in target_names:
 
@@ -28,36 +46,38 @@ def create_graph(df, target_names, thresholds, plot_prop, date, data_paths) -> p
 
             plt.plot(x_values, y_values,
                     color=group['color'].iloc[0],
-                    linewidth=0.75,
+                    linewidth=GRAPH_LINEWIDTH,
                     label=sample_name if sample_name not in plt.gca().get_legend_handles_labels()[1] else ''
                     )
             # HINT: https://stackoverflow.com/a/47949224
 
         # Graph style
-        plt.title(f'Amplification plot for {target} {date}' , fontname='Cambria', fontsize=16)
-        plt.xlabel('Cycle', fontname='Cambria', fontsize=14)
-        plt.ylabel('ΔRn', fontname='Cambria', fontsize=14)
+        plt.title(f'Amplification plot for {target} {date}' , fontname=GRAPH_FONTNAME, fontsize=TITLE_FONTSIZE)
+        plt.xlabel('Cycle', fontname=GRAPH_FONTNAME, fontsize=AXIS_FONTSIZE)
+        plt.ylabel('ΔRn', fontname=GRAPH_FONTNAME, fontsize=AXIS_FONTSIZE)
 
         plt.grid(True, color='grey', axis='y')
-        plt.hlines(y=threshold, xmin=0, xmax=40, color='red', linestyles='dashed', label='Threshold')
+        plt.hlines(y=threshold, xmin=DISP_CYCLE_START, xmax=DISP_CYCLE_END,
+                   color=THRESHOLD_LINE_COL, linestyles=THRESHOLD_LINE_STYLE, label='Threshold'
+                   )
 
-        plt.xlim([0,40])
-        plt.gca().xaxis.set_major_locator(plt.MultipleLocator(2))
+        plt.xlim([DISP_CYCLE_START, DISP_CYCLE_END])
+        plt.gca().xaxis.set_major_locator(plt.MultipleLocator(DISP_CYCLE_INTERVAL))
 
-        plt.ylim([0.01, 5])
+        plt.ylim([DISP_RN_MIN, DISP_RN_MAX])
         plt.yscale('log')
         plt.gca().yaxis.set_major_formatter(ScalarFormatter())
 
         handles, labels = plt.gca().get_legend_handles_labels()
         handles, labels = zip(* sorted(zip(handles, labels), key=lambda x: x[1]))
 
-        plt.legend(handles, labels, fontsize=9, loc='upper left')
+        plt.legend(handles, labels, fontsize=LEGEND_FONTSIZE, loc='upper left')
         # HINT: https://www.sqlpey.com/python/top-2-methods-to-control-legend-order-in-matplotlib/
 
         now = datetime.now()
         fmt_datetime = now.strftime('%Y-%m-%d %H-%M-%S')
 
-        for file_type in ['png', 'tiff']:
+        for file_type in OUTPUT_FORMATS :
             plt.savefig(data_paths['OUTPUT'] / f'{date}_{target}_{fmt_datetime}.{file_type}',
                         transparent=plot_prop['transparent'],
                         dpi=plot_prop['dpi']
