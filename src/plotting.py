@@ -3,9 +3,7 @@ from datetime import datetime
 import matplotlib.pyplot as plt
 from matplotlib.ticker import ScalarFormatter
 
-from paths import OUTPUT
-
-def create_graph(df, target_names, thresholds, plot_prop, date) -> plt:
+def create_graph(df, target_names, thresholds, plot_prop, date, data_paths) -> plt:
 
     for target in target_names:
 
@@ -18,7 +16,10 @@ def create_graph(df, target_names, thresholds, plot_prop, date) -> plt:
 
         targets = slice_df.groupby(by='sample_name')
 
-        threshold = thresholds[target]
+        try:
+            threshold = thresholds[target]
+        except KeyError:
+            threshold = input(f'No threshold specified for {target}. Input the threshold manually, or add to the configuration file and restart the script: ')
 
         for sample_name, group in targets:
 
@@ -57,7 +58,7 @@ def create_graph(df, target_names, thresholds, plot_prop, date) -> plt:
         fmt_datetime = now.strftime('%Y-%m-%d %H-%M-%S')
 
         for file_type in ['png', 'tiff']:
-            plt.savefig(OUTPUT / f'{date}_{target}_{fmt_datetime}.{file_type}',
+            plt.savefig(data_paths['OUTPUT'] / f'{date}_{target}_{fmt_datetime}.{file_type}',
                         transparent=plot_prop['transparent'],
                         dpi=plot_prop['dpi']
                         )

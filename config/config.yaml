@@ -6,4 +6,5 @@ thresholds:
   B2M: None
 plot_properties:
   transparent: False
-  dpi: 600  
+  dpi: 600
+input_file_name: "Results - Copy.xls"
