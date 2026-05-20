@@ -1,9 +1,37 @@
 from datetime import datetime
+from pathlib import Path
 
 import matplotlib.pyplot as plt
 from matplotlib.ticker import ScalarFormatter
 
-def create_amplification_plots(df, target_names, thresholds, plot_prop, date, data_paths) -> plt:
+import pandas as pd
+
+
+def create_amplification_plots(
+        df: pd.DataFrame,
+        target_names: list[str],
+        thresholds: dict[str, float],
+        plot_prop: dict[str, Any],
+        date: str,
+        data_paths: dict[str, Path]
+        ) -> None:
+    """
+    Generate amplification plots for each target using processed qPCR data. Filters data by target and inclusion flag before plotting. Plots are saved to disk in output folder in multiple formats.
+
+    Args:
+        df (pd.DataFrame): Processed DataFrame used to generate the plots.
+        target_names (list[str]): List of unique target names detected in the processed DataFrame.
+        thresholds (dict[str, float]): ΔRn threshold values per target.
+        plot_prop (dict[str, Any]): Plot configuration parameters (e.g. DPI, transparency)
+        date (str): Experiment date.
+        data_paths (dict[str, Path]): Dictionary containing resolved file paths.
+
+    Returns:
+        None
+
+    Notes:
+        If a threshold is not defined for a given target, the user is prompted to provide a value interactively.
+    """
     GRAPH_LINEWIDTH = 0.75
     GRAPH_FONTNAME = 'Cambria'
 
