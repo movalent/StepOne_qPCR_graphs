@@ -75,5 +75,6 @@ def load_plate_layout(mapping_path: Path) -> Worksheet:
 
     workbook = openpyxl.load_workbook(mapping_path)
     sheet = workbook.active
+    workbook.close()
 
     return sheet
