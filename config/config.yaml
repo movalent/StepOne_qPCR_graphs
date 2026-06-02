@@ -8,3 +8,4 @@ plot_properties:
   transparent: False
   dpi: 600
 input_file_name: "Results - Copy.xls"
+output_file_format: ["png", "tiff", "pdf"]  # Suggested formats: "png", "tiff", "svg", "pdf"
