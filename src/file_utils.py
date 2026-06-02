@@ -1,11 +1,21 @@
 import yaml
+from dataclasses import dataclass
 from pathlib import Path
+from typing import Any
 
 import pandas as pd
 import openpyxl
 from openpyxl.worksheet.worksheet import Worksheet
 
-def load_config(config_path: Path) -> tuple:
+@dataclass
+class Config:
+    target_thresholds: dict[str, float]
+    ref_genes: list[str]
+    plot_properties: dict[str, Any]
+    results_file_name: str
+
+
+def load_config(config_path: Path) -> Config:
     """
     Load configuration from config.yaml
 
@@ -20,20 +30,19 @@ def load_config(config_path: Path) -> tuple:
             - result_file_name (str): Raw data file name
     """
 
-    with open(config_path) as file:
+    with open(config_path, 'r', encoding='utf-8') as file:
         config = yaml.safe_load(file)
         # print(config)
 
-        ref_genes = config['housekeeping_genes']
-        ref_genes = [x.lower() for x in ref_genes]
+        ref_genes = [x.lower() for x in config['housekeeping_genes']]
 
-        target_thresholds = config['thresholds']
+        return Config(
+            target_thresholds = config['thresholds'],
+            ref_genes = ref_genes,
+            plot_properties = config['plot_properties'],
+            results_file_name = config['input_file_name']
+            )
 
-        plot_properties = config['plot_properties']
-
-        results_file_name = config['input_file_name']
-
-        return target_thresholds, ref_genes, plot_properties, results_file_name
 
 def load_raw_data(raw_path: Path, mapping_path: Path) -> tuple:
     """

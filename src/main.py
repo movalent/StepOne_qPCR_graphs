@@ -19,11 +19,11 @@ def main() -> None:
 
     # Load configuation
     logger.info('Loading configuration')
-    target_thresholds, ref_genes, plot_properties, results_file_name = file_utils.load_config(CONFIG)
+    config = file_utils.load_config(CONFIG)
 
     # Resolve paths
     logger.info('Resolving paths')
-    data_paths = create_paths(results_file_name)
+    data_paths = create_paths(config.results_file_name)
 
     # Load raw data and plate mapping
     logger.info('Loading raw data')
@@ -42,7 +42,7 @@ def main() -> None:
     # Generate and save the plots
     logger.info('Creating plots (%d targets)', len(target_names))
     plotting.create_amplification_plots(raw_data, target_names,
-                          target_thresholds, plot_properties,
+                          config.target_thresholds, config.plot_properties,
                           experiment_date_formatted, data_paths)
 
 if __name__ == '__main__':
