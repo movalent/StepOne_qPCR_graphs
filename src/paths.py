@@ -3,7 +3,7 @@ from pathlib import Path
 MAIN_DIR = Path(__file__).resolve(strict=True).parent.parent
 CONFIG = MAIN_DIR / 'config' / 'config.yaml'
 
-def create_paths(results_input: str) -> dict[str, Path]:
+def create_paths(results_input: str, plate_layout: str = 'Plate_layout.xlsx') -> dict[str, Path]:
     """
     Construct file system paths used in the qPCR analysis.
 
@@ -17,8 +17,11 @@ def create_paths(results_input: str) -> dict[str, Path]:
                     - "OUTPUT": Folder for saving generated plots
     """
 
+    output_dir = MAIN_DIR / 'data' / 'output'
+    output_dir.mkdir(parents=True, exist_ok=True)
+
     return {
-        'INPUT': MAIN_DIR / 'data' / 'input' / f'{results_input}',
-        'LEGEND': MAIN_DIR / 'data' / 'metadata' / 'Plate_layout.xlsx',
-        'OUTPUT': MAIN_DIR / 'data' / 'output'
+        'INPUT': MAIN_DIR / 'data' / 'input' / results_input,
+        'LEGEND': MAIN_DIR / 'data' / 'metadata' / plate_layout,
+        'OUTPUT': output_dir
     }
