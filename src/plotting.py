@@ -101,6 +101,9 @@ def create_amplification_plots(
 
     OUTPUT_FORMATS = ['png', 'tiff', 'pdf']
 
+    now = datetime.now()
+    fmt_datetime = now.strftime('%Y-%m-%d %H-%M-%S')
+
     for target in target_names:
 
         slice_df = df.loc[
@@ -181,11 +184,8 @@ def create_amplification_plots(
             loc='upper left'
         )
 
-        now = datetime.now()
-        fmt_datetime = now.strftime('%Y-%m-%d %H-%M-%S')
-
         for file_type in OUTPUT_FORMATS :
-            plt.savefig(
+            fig.savefig(
                 data_paths['OUTPUT'] / f'{date}_{target}_{fmt_datetime}.{file_type}',
                 transparent=plot_prop['transparent'],
                 dpi=plot_prop['dpi']
