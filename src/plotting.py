@@ -1,3 +1,4 @@
+import re
 from datetime import datetime
 from pathlib import Path
 from typing import Any
@@ -6,6 +7,53 @@ import matplotlib.pyplot as plt
 from matplotlib.ticker import ScalarFormatter
 
 import pandas as pd
+
+def nat_keys(string: str) -> list:
+    """
+    Split string into text and numbers for natural sorting
+
+    Args:
+        string (str): Sample name.
+
+    Returns:
+        list: List containing only samples with numbers
+    """
+    parts = re.split(r'(\d*\.?\d*)', string)
+    key = []
+
+    for part in parts:
+        if re.fullmatch(r'\d+\.\d+', part):
+            key.append(float(part))
+        elif part.isdigit():
+            key.append(int(part))
+        else:
+            key.append(part.lower())
+
+    return key
+
+def sort_key(name: str) -> tuple:
+    """
+    Create custom sort key.
+
+    Args:
+        name (str): String to be asessed.
+
+    Returns:
+        tuple: Tuple with position.
+
+    Notes:
+        Legend is hard-coded to place numeric values first (0, ), then any text (1, ) and Mock samples at the bottom
+        (2, ).
+    """
+    if name.lower().startswith('mock'):
+        return (2, nat_keys(name))
+
+    match = re.match(r'^(\d+(?:\.\d+)?)%', name)
+    if match:
+        numeric_value = float(match.group(1))
+        return (0, numeric_value, nat_keys(name))
+
+    return (1, nat_keys(name))
 
 
 def create_amplification_plots(
@@ -38,7 +86,8 @@ def create_amplification_plots(
 
     TITLE_FONTSIZE = 16
     AXIS_FONTSIZE = 14
-    LEGEND_FONTSIZE = 9
+    LEGEND_FONTSIZE = 7
+    THRESHOLD_LABEL_FONTSIZE = 10
 
     DISP_CYCLE_START = 0
     DISP_CYCLE_END = 40
@@ -54,35 +103,31 @@ def create_amplification_plots(
 
     for target in target_names:
 
-        slice_df = df.loc[(df['Target Name'] == target) &
-                          (df['include'] == 1)
-                          ]
+        slice_df = df.loc[
+            (df['Target Name'] == target) &
+            (df['include'] == 1)
+            ]
 
         if slice_df.empty:
             continue
 
-        targets = slice_df.groupby(by='sample_name')
-
         try:
-            threshold = thresholds[target]
+            threshold = float(thresholds[target])
         except KeyError:
             threshold = float(input(f'No threshold specified for {target}. Input the threshold manually, or add to the configuration file and restart the script: '))
 
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=(8,5))
+
+        targets = slice_df.groupby(by='sample_name')
 
         for sample_name, group in targets:
-
-            x_values = group['Cycle']
-            y_values = group['ΔRn']
-
             ax.plot(
-                x_values,
-                y_values,
+                group['Cycle'],
+                group['ΔRn'],
                 color=group['color'].iloc[0],
                 linewidth=GRAPH_LINEWIDTH,
-                label=sample_name if sample_name not in plt.gca().get_legend_handles_labels()[1] else ''
-                )
-            # HINT: https://stackoverflow.com/a/47949224
+                label=sample_name
+            )
 
         # Graph style
         ax.set_title(
@@ -94,15 +139,29 @@ def create_amplification_plots(
         ax.set_ylabel('ΔRn', fontname=GRAPH_FONTNAME, fontsize=AXIS_FONTSIZE)
 
         ax.grid(True, color='grey', axis='y')
+
+        # Threshold line
         ax.hlines(
             y=threshold,
             xmin=DISP_CYCLE_START,
             xmax=DISP_CYCLE_END,
             color=THRESHOLD_LINE_COL,
             linestyles=THRESHOLD_LINE_STYLE,
-            label='Threshold'
+            linewidth=1
             )
 
+        # Threshold label
+        ax.text(
+            DISP_CYCLE_END * 0.98,
+            threshold * 1.05,
+            'Threshold',
+            color=THRESHOLD_LINE_COL,
+            fontsize=THRESHOLD_LABEL_FONTSIZE,
+            ha='right',
+            va='bottom'
+            )
+
+        # Axes formatting
         ax.set_xlim([DISP_CYCLE_START, DISP_CYCLE_END])
         ax.xaxis.set_major_locator(plt.MultipleLocator(DISP_CYCLE_INTERVAL))
 
@@ -110,11 +169,17 @@ def create_amplification_plots(
         ax.set_yscale('log')
         ax.yaxis.set_major_formatter(ScalarFormatter())
 
-        handles, labels = plt.gca().get_legend_handles_labels()
-        handles, labels = zip(* sorted(zip(handles, labels), key=lambda x: x[1]))
+        # Legend
+        handles, labels = ax.get_legend_handles_labels()
+        sorted_pairs = sorted(zip(labels, handles), key=lambda x: sort_key(x[0]))
+        labels_sorted, handles_sorted = zip(*sorted_pairs)
 
-        ax.legend(handles, labels, fontsize=LEGEND_FONTSIZE, loc='upper left')
-        # HINT: https://www.sqlpey.com/python/top-2-methods-to-control-legend-order-in-matplotlib/
+        ax.legend(
+            handles_sorted,
+            labels_sorted,
+            fontsize=LEGEND_FONTSIZE,
+            loc='upper left'
+        )
 
         now = datetime.now()
         fmt_datetime = now.strftime('%Y-%m-%d %H-%M-%S')
