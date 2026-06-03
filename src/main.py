@@ -28,7 +28,8 @@ def main() -> None:
     # Load raw data and plate mapping
     logger.info('Loading raw data')
     raw_data, mapping_data = file_utils.load_raw_data(data_paths['INPUT'], data_paths['LEGEND'])
-    openpyxl_sheet = file_utils.load_plate_layout(data_paths['LEGEND'])  # Pandas does not support extracting color
+    logger.info('Loading plate mapping') # Pandas does not support extracting color from Excell cells
+    openpyxl_sheet = file_utils.load_plate_layout(data_paths['LEGEND'])
 
     # Process the data
     logger.info('Preprocessing')
@@ -46,4 +47,9 @@ def main() -> None:
                           experiment_date_formatted, data_paths)
 
 if __name__ == '__main__':
-    main()
+    try:
+        main()
+    except Exception as e:
+        logging.exception('Script failed to execute properly')
+        raise
+
