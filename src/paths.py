@@ -1,7 +1,7 @@
 from pathlib import Path
 
-MAIN_DIR = Path(__file__).resolve(strict=True).parent.parent
-CONFIG = MAIN_DIR / 'config' / 'config.yaml'
+PROJECT_ROOT = Path(__file__).resolve(strict=True).parent.parent
+CONFIG = PROJECT_ROOT / 'config' / 'config.yaml'
 
 def create_paths(results_input: str, plate_layout: str = 'Plate_layout.xlsx') -> dict[str, Path]:
     """
@@ -9,6 +9,7 @@ def create_paths(results_input: str, plate_layout: str = 'Plate_layout.xlsx') ->
 
     Args:
         results_input (str): File name of the raw qPCR results file
+        plate_layout (str): File name of the Excel plate layout
 
     Returns:
         Dict[str, Path]: Dictionary containing resolved paths with keys:
@@ -17,11 +18,11 @@ def create_paths(results_input: str, plate_layout: str = 'Plate_layout.xlsx') ->
                     - "OUTPUT": Folder for saving generated plots
     """
 
-    output_dir = MAIN_DIR / 'data' / 'output'
+    output_dir = PROJECT_ROOT / 'data' / 'output'
     output_dir.mkdir(parents=True, exist_ok=True)
 
     return {
-        'INPUT': MAIN_DIR / 'data' / 'input' / results_input,
-        'LEGEND': MAIN_DIR / 'data' / 'metadata' / plate_layout,
+        'INPUT': PROJECT_ROOT / 'data' / 'input' / results_input,
+        'LEGEND': PROJECT_ROOT / 'data' / 'metadata' / plate_layout,
         'OUTPUT': output_dir
     }

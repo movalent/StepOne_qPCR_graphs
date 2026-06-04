@@ -14,7 +14,7 @@ def extract_date(raw_data: pd.DataFrame) -> str:
         str: Formatted date string (e.g. 01 Jan 2021)
 
     Notes:
-        Assumes the date is localized at fixed position in the input DataFrame,
+        Assumes the date is located at a fixed position in the input DataFrame,
         defined by DATE_ROW_IDX and DATE_COL_IDX. BST time zone information is
         removed.
     """
@@ -39,7 +39,7 @@ def preprocess_raw_data(raw_data: pd.DataFrame) -> pd.DataFrame:
         and index set to well positions.
 
     Notes:
-        The StepOne export excel file containts metadata rows above the data table.
+        The StepOne export Excel file containts metadata rows above the data table.
         PLATE_ROW_START defines the index of the first row containing amplification data.
     """
     PLATE_ROW_START = 6
@@ -94,9 +94,9 @@ def preprocess_name_color(sheet: Worksheet, raw_data: pd.DataFrame) -> tuple:
         raw_data (DataFrame): Preprocessed qPCR data indexed by well position.
 
     Returns:
-        tuple[pd.DataFrame, list]:
+        tuple[pd.DataFrame, np.array]:
             - pd.DataFrame: Updated DataFrame with added sample_name and sample_color columns
-            - list: List of unique target names (e.g. eGFP, RNAseP, GAPDH, Spike)
+            - np.array: List of unique target names (e.g. eGFP, RNAseP, GAPDH, Spike)
 
     Notes:
         The mapping workbook contains two plate layouts:
