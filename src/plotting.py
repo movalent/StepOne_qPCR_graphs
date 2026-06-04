@@ -114,10 +114,13 @@ def create_amplification_plots(
         if slice_df.empty:
             continue
 
-        try:
-            threshold = float(thresholds[target])
-        except KeyError:
-            threshold = float(input(f'No threshold specified for {target}. Input the threshold manually, or add to the configuration file and restart the script: '))
+        if target not in thresholds:
+            raise ValueError(f'Target {target} not present in configuration file. Add this target to config.yaml')
+        if thresholds[target] is None:
+            raise ValueError(f'Threshold for target {target} is not set in config.yaml. '
+                             'Please provide a value for ΔRn threshold.')
+
+        threshold = float(thresholds[target])
 
         fig, ax = plt.subplots(figsize=(8,5))
 
@@ -191,5 +194,5 @@ def create_amplification_plots(
                 dpi=plot_prop['dpi']
                 )
 
-        plt.close()
+        plt.close(fig)
 

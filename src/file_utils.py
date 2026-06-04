@@ -7,12 +7,31 @@ import pandas as pd
 import openpyxl
 from openpyxl.worksheet.worksheet import Worksheet
 
-@dataclass
+@dataclass(frozen=True)
 class Config:
     target_thresholds: dict[str, float]
     ref_genes: list[str]
     plot_properties: dict[str, Any]
     results_file_name: str
+
+def validate_thresholds(thresholds: dict[str, Any]) -> dict[str, float]:
+
+    if not isinstance(thresholds, dict):
+        raise ValueError('"Thresholds" must be a dictionary of target names and numeric values.')
+
+    validated_thresholds = {}
+
+    for target, value in thresholds.items():
+        if value is None:
+            raise ValueError(f'Threshold for target {target} is not set in config.yaml. '
+                             'Please provide a value for ΔRn threshold.')
+
+        try:
+            validated_thresholds[target] = float(value)
+        except (TypeError, ValueError) as e:
+            raise ValueError(f'Threshold for target {target} must be numeric. Current value: {value}')
+
+    return validated_thresholds
 
 
 def load_config(config_path: Path) -> Config:
@@ -23,7 +42,7 @@ def load_config(config_path: Path) -> Config:
         config_path (Path): Path to configuration file
 
     Returns:
-        tuple: Tuple with parsed configuration
+        Config object containing:
             - target_thresholds (float): ΔRn threshold values per target
             - ref_genes (str): Lowercased housekeeping genes
             - plot_properties (Any): Plot settings (dpi, transparency, etc.)
@@ -34,7 +53,11 @@ def load_config(config_path: Path) -> Config:
         config = yaml.safe_load(file)
         # print(config)
 
+        if config is None:
+            raise ValueError(f'Configuration file is empty. File localization: {config_path}')
+
         ref_genes = [x.lower() for x in config['housekeeping_genes']]
+        target_thresholds = validate_thresholds(config['thresholds'])
 
         return Config(
             target_thresholds = config['thresholds'],
@@ -53,12 +76,18 @@ def load_raw_data(raw_path: Path, mapping_path: Path) -> tuple:
         mapping_path (Path): Path to the plate mapping Excel file.
 
     Returns:
-        Tuple[pd.Dataframe, pd.Dataframe]:
+        Tuple[pd.DataFrame, pd.DataFrame]:
             - raw_data: Raw amplification data
             - mapping_data: Plate layout data defining sample inclusion and positions
     """
     raw_data = pd.read_excel(raw_path)
     mapping_data = pd.read_excel(mapping_path)
+
+    if raw_data.empty:
+        raise ValueError(f'Raw qPCR results file contains no data.')
+
+    if mapping_data.empty:
+        raise ValueError(f'Plate mapping file contains no data.')
 
     return raw_data, mapping_data
 
