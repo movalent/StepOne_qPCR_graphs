@@ -49,10 +49,11 @@ def run_pipeline() -> None:
         config.target_thresholds,
         config.plot_properties,
         experiment_date_formatted,
-        data_paths
+        data_paths,
+        config.output_file_format
         )
 
-def main() -> None:
+def main() -> int:
 
     logging.basicConfig(
         level=logging.INFO,

@@ -13,6 +13,7 @@ class Config:
     ref_genes: list[str]
     plot_properties: dict[str, Any]
     results_file_name: str
+    output_file_format: list[str]
 
 def validate_thresholds(thresholds: dict[str, Any]) -> dict[str, float]:
 
@@ -46,7 +47,8 @@ def load_config(config_path: Path) -> Config:
             - target_thresholds (float): ΔRn threshold values per target
             - ref_genes (str): Lowercased housekeeping genes
             - plot_properties (Any): Plot settings (dpi, transparency, etc.)
-            - result_file_name (str): Raw data file name
+            - results_file_name (str): Raw data file name
+            - output_file_format (list): File formats of the saved figure
     """
 
     with open(config_path, 'r', encoding='utf-8') as file:
@@ -60,10 +62,11 @@ def load_config(config_path: Path) -> Config:
         target_thresholds = validate_thresholds(config['thresholds'])
 
         return Config(
-            target_thresholds = config['thresholds'],
+            target_thresholds = target_thresholds,
             ref_genes = ref_genes,
             plot_properties = config['plot_properties'],
-            results_file_name = config['input_file_name']
+            results_file_name = config['input_file_name'],
+            output_file_format = config['output_file_format']
             )
 
 

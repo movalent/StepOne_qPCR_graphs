@@ -62,7 +62,8 @@ def create_amplification_plots(
         thresholds: dict[str, float],
         plot_prop: dict[str, Any],
         date: str,
-        data_paths: dict[str, Path]
+        data_paths: dict[str, Path],
+        output_file_format: list[str]
         ) -> None:
     """
     Generate amplification plots for each target using processed qPCR data. Filters data by target and inclusion flag before plotting. Plots are saved to disk in output folder in multiple formats.
@@ -98,8 +99,6 @@ def create_amplification_plots(
 
     THRESHOLD_LINE_COL = 'red'
     THRESHOLD_LINE_STYLE = 'dashed'
-
-    OUTPUT_FORMATS = ['png', 'tiff', 'pdf']
 
     now = datetime.now()
     fmt_datetime = now.strftime('%Y-%m-%d %H-%M-%S')
@@ -187,7 +186,7 @@ def create_amplification_plots(
             loc='upper left'
         )
 
-        for file_type in OUTPUT_FORMATS :
+        for file_type in output_file_format :
             fig.savefig(
                 data_paths['OUTPUT'] / f'{date}_{target}_{fmt_datetime}.{file_type}',
                 transparent=plot_prop['transparent'],
