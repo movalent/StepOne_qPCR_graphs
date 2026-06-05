@@ -5,27 +5,21 @@ from openpyxl.worksheet.worksheet import Worksheet
 
 def extract_date(raw_data: pd.DataFrame) -> str:
     """
-    Extract the experiment date from a fixed location in the StepOne Excel export.
+    Extract the experiment date from a StepOne export header.
 
     Args:
         raw_data (pd.DataFrame): DataFrame representing the raw StepOne Excel export.
 
     Returns:
         str: Formatted date string (e.g. 01 Jan 2021)
-
-    Notes:
-        Assumes the date is located at a fixed position in the input DataFrame,
-        defined by DATE_ROW_IDX and DATE_COL_IDX. BST time zone information is
-        removed.
     """
-    DATE_ROW_IDX = 2
-    DATE_COL_IDX = 1
 
-    experiment_date = re.sub(r'\s?(AM|PM|BST)', '', raw_data.iloc[DATE_ROW_IDX, DATE_COL_IDX])
-    experiment_date = pd.to_datetime(experiment_date)
-    experiment_date_formatted = experiment_date.strftime('%d %b %Y')
-
-    return experiment_date_formatted
+    for idx, row in raw_data.iterrows():
+        if str(row.iloc[0].strip()) == 'Experiment Run End Time':
+            experiment_date = str(row.iloc[1])
+            experiment_date = re.sub(r'\s?(AM|PM|BST)', '', experiment_date)
+            experiment_date = pd.to_datetime(experiment_date)
+            return experiment_date.strftime('%d %b %Y')
 
 def preprocess_raw_data(raw_data: pd.DataFrame) -> pd.DataFrame:
     """
