@@ -40,14 +40,27 @@ def preprocess_raw_data(raw_data: pd.DataFrame) -> pd.DataFrame:
 
     Notes:
         The StepOne export Excel file containts metadata rows above the data table.
-        PLATE_ROW_START defines the index of the first row containing amplification data.
+        Script automatically detects the first row containing amplification data.
     """
-    PLATE_ROW_START = 6
+    header_row_idx = None
+    expected_cols = {'Well', 'Cycle', 'Target Name'}
+
+    for idx, row in raw_data.iterrows():
+        if expected_cols.issubset(set(row.values)):
+            header_row_idx = idx
+            break
+
+    if header_row_idx is None:
+        raise ValueError('Could not locate amplification data in input file.')
 
     df = raw_data.copy()
-    df = df.iloc[PLATE_ROW_START:,]
+    df = df.iloc[header_row_idx:]
     df = df.rename(columns=df.iloc[0]).iloc[1:]
     df = df.set_index('Well')
+
+    # Enforce numeric types
+    df['Cycle'] = pd.to_numeric(df['Cycle'], errors='coerce')
+    df['ΔRn'] = pd.to_numeric(df['ΔRn'], errors='coerce')
 
     return df
 
